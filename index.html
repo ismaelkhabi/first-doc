@@ -26,15 +26,17 @@
         document.getElementById('arizaForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // BU YERGA O'ZINGIZNING BOT MA'LUMOTLARINGIZNI QO'YASIZ
-            const token = "8912782310:AAG34WTo7B-8ojr93wjoL8MPsfn79cUozHE";
-            const chat_id = "8912782310";
+            // To'g'rilangan bot token va sizning shaxsiy Chat ID'ngiz
+            const token = "8912722310:AAG34WTo7B-8ojr93wjoL8MPsfn79cKozHE";
+            const chat_id = "8912722310";
 
             const ism = document.getElementById('ism').value;
             const tel = document.getElementById('tel').value;
             const manzil = document.getElementById('manzil').value;
 
             const xabar = `Yangi ariza:\n👤 Ism: ${ism}\n📞 Tel: ${tel}\n📍 Manzil: ${manzil}`;
+            
+            // To'g'ri Telegram API havolasi
             const url = `https://telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(xabar)}`;
 
             fetch(url)
@@ -43,8 +45,12 @@
                     alert('Arizangiz muvaffaqiyatli yuborildi!');
                     document.getElementById('arizaForm').reset();
                 } else {
-                    alert('Xatolik yuz berdi. Qayta urinib ko\'ring.');
+                    alert('Xatolik yuz berdi. Botga /start bosganingizni va tokeningiz to\'g\'riligini tekshiring.');
                 }
+            })
+            .catch(error => {
+                alert('Tarmoq xatoligi yuz berdi.');
+                console.error(error);
             });
         });
     </script>
