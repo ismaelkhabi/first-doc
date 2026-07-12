@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mening Saytim</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 50px; background: #f4f4f9; }
+        form { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <form id="arizaForm">
+        <h3>Buyurtma berish</h3>
+        <input type="text" id="ism" placeholder="Ismingiz" required>
+        <input type="tel" id="tel" placeholder="Telefon raqamingiz" required>
+        <input type="text" id="manzil" placeholder="Manzilingiz" required>
+        <button type="submit">Yuborish</button>
+    </form>
+
+    <script>
+        document.getElementById('arizaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // BU YERGA O'ZINGIZNING BOT MA'LUMOTLARINGIZNI QO'YASIZ
+            const token = "8912782310:AAG34WTo7B-8ojr93wjoL8MPsfn79cUozHE";
+            const chat_id = "8651223152";
+
+            const ism = document.getElementById('ism').value;
+            const tel = document.getElementById('tel').value;
+            const manzil = document.getElementById('manzil').value;
+
+            const xabar = `Yangi ariza:\n👤 Ism: ${ism}\n📞 Tel: ${tel}\n📍 Manzil: ${manzil}`;
+            const url = `https://telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(xabar)}`;
+
+            fetch(url)
+            .then(response => {
+                if(response.ok) {
+                    alert('Arizangiz muvaffaqiyatli yuborildi!');
+                    document.getElementById('arizaForm').reset();
+                } else {
+                    alert('Xatolik yuz berdi. Qayta urinib ko\'ring.');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
