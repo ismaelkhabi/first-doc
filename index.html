@@ -23,36 +23,55 @@
     </form>
 
     <script>
-        document.getElementById('arizaForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // To'g'rilangan bot token va sizning shaxsiy Chat ID'ngiz
-            const token = "8912722310:AAG34WTo7B-8ojr93wjoL8MPsfn79cKozHE";
-            const chat_id = "8912722310";
-
-            const ism = document.getElementById('ism').value;
-            const tel = document.getElementById('tel').value;
-            const manzil = document.getElementById('manzil').value;
-
-            const xabar = `Yangi ariza:\n👤 Ism: ${ism}\n📞 Tel: ${tel}\n📍 Manzil: ${manzil}`;
-            
-            // To'g'ri Telegram API havolasi
-            const url = `https://telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(xabar)}`;
-
-            fetch(url)
-            .then(response => {
-                if(response.ok) {
-                    alert('Arizangiz muvaffaqiyatli yuborildi!');
-                    document.getElementById('arizaForm').reset();
-                } else {
-                    alert('Xatolik yuz berdi. Botga /start bosganingizni va tokeningiz to\'g\'riligini tekshiring.');
+        import express from 'express';
+        
+        const app = express();
+        app.use(express.json()); // Essential to parse the JSON data from Telegram
+        
+        const TELEGRAM_TOKEN = 8912782310:AAG34WTo7B-8ojr93wjoL8MPsfn79cUozHE; // Replace with your BotFather token
+        const PORT = process.env.PORT || 3000;
+        
+        // 1. Create the webhook endpoint
+        app.post('/telegram-webhook', async (req, res) => {
+            try {
+                const { message } = req.body;
+        
+                // Verify that the incoming request contains a valid message
+                if (message && message.chat && message.text) {
+                    const chatId = message.chat.id;
+                    const userText = message.text;
+        
+                    console.log(`Received message: "${userText}" from Chat ID: ${chatId}`);
+        
+                    // 2. Prepare a response based on user input
+                    let replyText = `You said: ${userText}`;
+                    if (userText.toLowerCase() === '/start') {
+                        replyText = 'Welcome to our website bot!';
+                    }
+        
+                    // 3. Send the response back to Telegram via its API
+                    await fetch(`https://telegram.org{TELEGRAM_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: replyText
+                        })
+                    });
                 }
-            })
-            .catch(error => {
-                alert('Tarmoq xatoligi yuz berdi.');
-                console.error(error);
-            });
+        
+                // Always return a 200 OK status to Telegram so it stops retrying the request
+                res.status(200).send('OK');
+            } catch (error) {
+                console.error('Error processing webhook:', error);
+                res.sendStatus(500);
+            }
         });
+        
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+
     </script>
 
 </body>
