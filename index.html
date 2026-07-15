@@ -1,78 +1,478 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mening Saytim</title>
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; padding: 50px; background: #f4f4f9; }
-        form { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Nightfall Society — Field Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-deep: #0b1026;
+    --navy-panel: #131a38;
+    --navy-line: #232d54;
+    --gold: #e8b94a;
+    --gold-dim: #8a6f34;
+    --parchment: #ede9dd;
+    --slate: #7f8bab;
+    --danger: #d97b6a;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--navy-deep);
+    color: var(--parchment);
+    font-family: 'Karla', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+
+  canvas#stars{
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .wrap{
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ---------- HERO ---------- */
+
+  header.hero{
+    padding: 96px 0 64px;
+    border-bottom: 1px solid var(--navy-line);
+  }
+
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .eyebrow::before{
+    content: '';
+    width: 22px; height: 1px;
+    background: var(--gold-dim);
+  }
+
+  h1.headline{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(40px, 6vw, 78px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    max-width: 900px;
+    margin: 0 0 28px;
+  }
+  h1.headline em{
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  p.lede{
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--slate);
+    max-width: 560px;
+    margin: 0;
+  }
+
+  .coords{
+    margin-top: 40px;
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--slate);
+  }
+  .coords span{ color: var(--gold); }
+
+  /* ---------- MAIN ---------- */
+
+  main{
+    padding: 80px 0 120px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 72px;
+    align-items: start;
+  }
+
+  @media (max-width: 860px){
+    main{ grid-template-columns: 1fr; gap: 56px; }
+  }
+
+  .about h2{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 30px;
+    margin: 0 0 18px;
+    color: var(--parchment);
+  }
+  .about p{
+    color: var(--slate);
+    line-height: 1.8;
+    font-size: 15.5px;
+    margin: 0 0 20px;
+  }
+
+  .roster{
+    margin-top: 44px;
+    border-top: 1px solid var(--navy-line);
+    padding-top: 28px;
+  }
+  .roster-row{
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--navy-line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--slate);
+  }
+  .roster-row span:last-child{ color: var(--parchment); }
+
+  /* ---------- FORM PANEL ---------- */
+
+  .panel{
+    background: var(--navy-panel);
+    border: 1px solid var(--navy-line);
+    border-radius: 4px;
+    padding: 44px 40px 40px;
+    position: relative;
+  }
+
+  .panel-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .panel-title{
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+  }
+  .panel-sub{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--slate);
+    letter-spacing: 0.06em;
+  }
+
+  /* constellation progress */
+  svg.constellation{
+    width: 100%;
+    height: 64px;
+    margin: 22px 0 30px;
+    overflow: visible;
+  }
+  svg.constellation line{
+    stroke: var(--navy-line);
+    stroke-width: 1.5;
+    transition: stroke 0.5s ease;
+  }
+  svg.constellation line.lit{ stroke: var(--gold-dim); }
+  svg.constellation circle{
+    fill: var(--navy-deep);
+    stroke: var(--slate);
+    stroke-width: 1.5;
+    transition: all 0.4s ease;
+  }
+  svg.constellation circle.lit{
+    fill: var(--gold);
+    stroke: var(--gold);
+    filter: drop-shadow(0 0 6px rgba(232,185,74,0.8));
+  }
+
+  form{ display: flex; flex-direction: column; gap: 22px; }
+
+  .field{ display: flex; flex-direction: column; gap: 8px; }
+  .field label{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+  .field input, .field textarea{
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--navy-line);
+    color: var(--parchment);
+    font-family: 'Karla', sans-serif;
+    font-size: 15px;
+    padding: 8px 2px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    resize: none;
+  }
+  .field input::placeholder, .field textarea::placeholder{ color: #4a5478; }
+  .field input:focus, .field textarea:focus{ border-color: var(--gold); }
+  .field textarea{ min-height: 84px; }
+
+  button.submit{
+    margin-top: 10px;
+    background: var(--gold);
+    color: var(--navy-deep);
+    border: none;
+    border-radius: 3px;
+    font-family: 'Karla', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.3s ease;
+  }
+  button.submit:hover{ background: #f2c766; }
+  button.submit:active{ transform: scale(0.98); }
+  button.submit:disabled{ opacity: 0.6; cursor: wait; }
+
+  .status{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    min-height: 18px;
+    margin-top: -4px;
+  }
+  .status.ok{ color: #8fd19e; }
+  .status.err{ color: var(--danger); }
+
+  footer{
+    border-top: 1px solid var(--navy-line);
+    padding: 32px 0 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--slate);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+</style>
 </head>
 <body>
 
-    <form id="arizaForm">
-        <h3>Buyurtma berish</h3>
-        <input type="text" id="ism" placeholder="Ismingiz" required>
-        <input type="tel" id="tel" placeholder="Telefon raqamingiz" required>
-        <input type="text" id="manzil" placeholder="Manzilingiz" required>
-        <button type="submit">Yuborish</button>
-    </form>
+<canvas id="stars"></canvas>
 
-    <script>
-        import express from 'express';
-        
-        const app = express();
-        app.use(express.json()); // Essential to parse the JSON data from Telegram
-        
-        const TELEGRAM_TOKEN = 8912782310:AAG34WTo7B-8ojr93wjoL8MPsfn79cUozHE; // Replace with your BotFather token
-        const PORT = process.env.PORT || 3000;
-        
-        // 1. Create the webhook endpoint
-        app.post('/telegram-webhook', async (req, res) => {
-            try {
-                const { message } = req.body;
-        
-                // Verify that the incoming request contains a valid message
-                if (message && message.chat && message.text) {
-                    const chatId = message.chat.id;
-                    const userText = message.text;
-        
-                    console.log(`Received message: "${userText}" from Chat ID: ${chatId}`);
-        
-                    // 2. Prepare a response based on user input
-                    let replyText = `You said: ${userText}`;
-                    if (userText.toLowerCase() === '/start') {
-                        replyText = 'Welcome to our website bot!';
-                    }
-        
-                    // 3. Send the response back to Telegram via its API
-                    await fetch(`https://telegram.org{TELEGRAM_TOKEN}/sendMessage`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            text: replyText
-                        })
-                    });
-                }
-        
-                // Always return a 200 OK status to Telegram so it stops retrying the request
-                res.status(200).send('OK');
-            } catch (error) {
-                console.error('Error processing webhook:', error);
-                res.sendStatus(500);
-            }
-        });
-        
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Field Log — Entry No. 047</div>
+    <h1 class="headline">The Nightfall Society is<br>taking new <em>observers</em>.</h1>
+    <p class="lede">A quiet, unhurried club for people who like to look up. We meet on clear nights, share coordinates, and keep a shared log of what we've seen. No experience required — just patience.</p>
+    <div class="coords">
+      <div>LAT <span>41.4036° N</span></div>
+      <div>LONG <span>2.1744° E</span></div>
+      <div>NEXT SESSION <span>New Moon, Aug 12</span></div>
+    </div>
+  </header>
 
-    </script>
+  <main>
+    <div class="about">
+      <h2>What the log is for</h2>
+      <p>Fill in the panel to the right and it reaches us directly — no form gets lost in an inbox. Tell us where you're observing from and what drew you to the sky; we read every entry before the next session.</p>
+      <p>Members receive a monthly star chart, a seat at our seasonal meets, and access to the shared observation log going back to 2019.</p>
+
+      <div class="roster">
+        <div class="roster-row"><span>Active observers</span><span>212</span></div>
+        <div class="roster-row"><span>Logged sessions</span><span>1,048</span></div>
+        <div class="roster-row"><span>Founded</span><span>2019</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Join the log</div>
+        <div class="panel-sub">4 STARS TO CHART</div>
+      </div>
+
+      <svg class="constellation" viewBox="0 0 400 64" preserveAspectRatio="none">
+        <line id="l1" x1="20" y1="44" x2="140" y2="16"/>
+        <line id="l2" x1="140" y1="16" x2="260" y2="44"/>
+        <line id="l3" x1="260" y1="44" x2="380" y2="18"/>
+        <circle id="s1" cx="20"  cy="44" r="6"/>
+        <circle id="s2" cx="140" cy="16" r="6"/>
+        <circle id="s3" cx="260" cy="44" r="6"/>
+        <circle id="s4" cx="380" cy="18" r="6"/>
+      </svg>
+
+      <form id="logForm">
+        <div class="field">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="Full name" data-star="s1" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" data-star="s2" required>
+        </div>
+        <div class="field">
+          <label for="location">Observing from</label>
+          <input type="text" id="location" name="location" placeholder="City or coordinates" data-star="s3" required>
+        </div>
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" placeholder="What draws you to the sky?" data-star="s4" required></textarea>
+        </div>
+
+        <button type="submit" class="submit" id="submitBtn">Send to the log</button>
+        <div class="status" id="status"></div>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <span>© The Nightfall Society, est. 2019</span>
+    <span>Field log entries are read within 48 hours</span>
+  </footer>
+</div>
+
+<script>
+/* ---------- ambient starfield ---------- */
+(function(){
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const count = Math.floor((canvas.width * canvas.height) / 9000);
+    stars = Array.from({length: count}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.3,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.015 + 0.005
+    }));
+  }
+
+  function draw(t){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(const s of stars){
+      const twinkle = reduced ? 0.6 : 0.5 + 0.5 * Math.sin(t * s.speed + s.phase);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(237,233,221,${0.15 + twinkle * 0.55})`;
+      ctx.fill();
+    }
+    if(!reduced) requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw(0);
+})();
+
+/* ---------- constellation lights up as fields fill ---------- */
+(function(){
+  const form = document.getElementById('logForm');
+  const fields = form.querySelectorAll('[data-star]');
+
+  function refresh(){
+    fields.forEach(f => {
+      const starId = f.getAttribute('data-star');
+      const star = document.getElementById(starId);
+      const filled = f.value.trim().length > 0;
+      star.classList.toggle('lit', filled);
+    });
+    document.getElementById('l1').classList.toggle('lit',
+      document.getElementById('s1').classList.contains('lit') &&
+      document.getElementById('s2').classList.contains('lit'));
+    document.getElementById('l2').classList.toggle('lit',
+      document.getElementById('s2').classList.contains('lit') &&
+      document.getElementById('s3').classList.contains('lit'));
+    document.getElementById('l3').classList.toggle('lit',
+      document.getElementById('s3').classList.contains('lit') &&
+      document.getElementById('s4').classList.contains('lit'));
+  }
+
+  fields.forEach(f => f.addEventListener('input', refresh));
+  refresh();
+})();
+
+/* ---------- Telegram integration ---------- */
+(function(){
+  // Your bot token — see note in chat about keeping this private in production.
+  const TELEGRAM_BOT_TOKEN = "8912782310:AAG34WTo7B-8ojr93wjoL8MPsfn79cUozHE";
+  // Replace with your own chat id. Message your bot once, then visit:
+  // https://api.telegram.org/bot<token>/getUpdates  to find it.
+  const TELEGRAM_CHAT_ID = "8912782310";
+
+  const form = document.getElementById('logForm');
+  const btn = document.getElementById('submitBtn');
+  const status = document.getElementById('status');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if(TELEGRAM_CHAT_ID === "8912782310"){
+      status.textContent = "8912782310";
+      status.className = "status err";
+      return;
+    }
+
+    const data = new FormData(form);
+    const text =
+      `New Nightfall Society log entry\n\n` +
+      `Name: ${data.get('name')}\n` +
+      `Email: ${data.get('email')}\n` +
+      `Observing from: ${data.get('location')}\n` +
+      `Message: ${data.get('message')}`;
+
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+    status.textContent = "";
+    status.className = "status";
+
+    try{
+      const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text })
+      });
+      const result = await res.json();
+
+      if(result.ok){
+        status.textContent = "Signal received. We'll be in touch.";
+        status.className = "status ok";
+        form.reset();
+        document.querySelectorAll('.constellation circle, .constellation line').forEach(el => el.classList.remove('lit'));
+      } else {
+        status.textContent = "Transmission failed: " + (result.description || "unknown error");
+        status.className = "status err";
+      }
+    } catch(err){
+      status.textContent = "Transmission failed. Check your connection.";
+      status.className = "status err";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Send to the log";
+    }
+  });
+})();
+</script>
 
 </body>
 </html>
